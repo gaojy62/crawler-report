@@ -17,6 +17,7 @@ class TwitterCrawler(BaseCrawler):
 
     def __init__(self, sources: List[dict]):
         super().__init__(sources)
+        self.cookies_path = os.getenv("TWITTER_COOKIES_PATH")
 
     async def fetch(self) -> List[CrawledItem]:
         """Fetch tweets from configured accounts"""
@@ -39,7 +40,7 @@ class TwitterCrawler(BaseCrawler):
         keywords = source.get("keywords", [])
 
         # Build yt-dlp command
-        url = f"https://twitter.com/{account}"
+        url = f"https://x.com/{account}"
 
         # yt-dlp command to extract tweet info as JSON
         cmd = [
@@ -51,8 +52,12 @@ class TwitterCrawler(BaseCrawler):
             "--playlist-end", str(limit),
             "--no-warnings",
             "--quiet",
-            url
         ]
+
+        if self.cookies_path:
+            cmd.extend(["--cookies", self.cookies_path])
+
+        cmd.append(url)
 
         try:
             # Run yt-dlp
@@ -115,7 +120,7 @@ class TwitterCrawler(BaseCrawler):
         # Get tweet URL
         tweet_id = data.get("id", "")
         username = source["account"]
-        url = f"https://twitter.com/{username}/status/{tweet_id}" if tweet_id else data.get("webpage_url", "")
+        url = f"https://x.com/{username}/status/{tweet_id}" if tweet_id else data.get("webpage_url", "")
 
         # Parse timestamp
         published_at = None

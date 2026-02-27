@@ -22,11 +22,30 @@ class Cache:
             db_path = str(cache_dir / "history.db")
 
         self.db_path = db_path
+        self._conn: Optional[sqlite3.Connection] = None
         self._init_db()
+
+    def _get_connection(self) -> sqlite3.Connection:
+        """Get or create database connection"""
+        if self._conn is None:
+            self._conn = sqlite3.connect(self.db_path)
+        return self._conn
+
+    def close(self):
+        """Close database connection"""
+        if self._conn:
+            self._conn.close()
+            self._conn = None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
 
     def _init_db(self):
         """Initialize database tables"""
-        conn = sqlite3.connect(self.db_path)
+        conn = self._get_connection()
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -47,7 +66,6 @@ class Cache:
         """)
 
         conn.commit()
-        conn.close()
 
     def _hash_url(self, url: str) -> str:
         """Generate SHA256 hash of URL"""
@@ -55,7 +73,7 @@ class Cache:
 
     def deduplicate(self, items: List[CrawledItem]) -> List[CrawledItem]:
         """Remove items that have been crawled before"""
-        conn = sqlite3.connect(self.db_path)
+        conn = self._get_connection()
         cursor = conn.cursor()
 
         unique_items = []
@@ -70,12 +88,11 @@ class Cache:
             if cursor.fetchone() is None:
                 unique_items.append(item)
 
-        conn.close()
         return unique_items
 
     def save_history(self, items: List[dict], score_key: str = "score"):
         """Save crawled items to history"""
-        conn = sqlite3.connect(self.db_path)
+        conn = self._get_connection()
         cursor = conn.cursor()
 
         for item in items:
@@ -100,11 +117,10 @@ class Cache:
             ))
 
         conn.commit()
-        conn.close()
 
     def cleanup_old_items(self, days: int = 30):
         """Remove items older than specified days"""
-        conn = sqlite3.connect(self.db_path)
+        conn = self._get_connection()
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -114,6 +130,5 @@ class Cache:
 
         deleted = cursor.rowcount
         conn.commit()
-        conn.close()
 
         return deleted
