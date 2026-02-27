@@ -1,0 +1,47 @@
+name: Generate Daily Report
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # UTC 0:00 = 北京 8:00
+  workflow_dispatch:
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Restore cache
+        uses: actions/cache/restore@v4
+        with:
+          path: cache/
+          key: crawler-cache-${{ github.run_id }}
+          restore-keys: |
+            crawler-cache-
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install yt-dlp
+
+      - name: Run crawler
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          WORKER_URL: ${{ secrets.WORKER_URL }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: python src/main.py
+
+      - name: Save cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: cache/
+          key: crawler-cache-${{ github.run_id }}

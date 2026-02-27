@@ -1,0 +1,64 @@
+report:
+  name: "财经要闻日报"
+  top_n: 5
+  min_score: 6
+  language: "zh"
+
+sources:
+  rss:
+    - name: "华尔街日报-市场"
+      url: "https://feeds.a.dj.com/rss/RSSMarketsMain.xml"
+      priority: 10
+      limit: 20
+
+    - name: "彭博社-市场"
+      url: "https://feeds.bloomberg.com/markets/news.rss"
+      priority: 9
+      limit: 20
+
+    - name: "财新网-金融"
+      url: "https://rsshub.app/caixin/finance"
+      priority: 8
+      limit: 15
+
+    - name: "Coindesk"
+      url: "https://www.coindesk.com/arc/outboundfeeds/rss/"
+      priority: 7
+      limit: 15
+
+  twitter:
+    - account: "WSJ"
+      type: media
+      priority: 10
+      limit: 20
+
+    - account: "markets"
+      type: media
+      priority: 9
+      limit: 15
+
+    - account: "elonmusk"
+      type: kol
+      priority: 7
+      keywords: ["bitcoin", "crypto", "stock", "market"]
+      limit: 10
+
+ai:
+  provider: "deepseek"
+  model: "deepseek-chat"
+  max_tokens: 4000
+
+  scoring:
+    dimensions:
+      - name: relevance
+        description: "与财经、金融、投资的相关程度"
+        weight: 0.3
+      - name: value
+        description: "信息密度和内容价值"
+        weight: 0.25
+      - name: timeliness
+        description: "新闻时效性和时间敏感度"
+        weight: 0.25
+      - name: impact
+        description: "对市场的潜在影响程度"
+        weight: 0.2
