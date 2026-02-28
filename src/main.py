@@ -92,10 +92,12 @@ async def main():
         [s["name"] for s in rss_sources] +
         [f"@{s['account']}" for s in twitter_sources]
     )
+    ai_stats = scorer.get_usage_stats()
     report = generator.generate(
         items=top_items,
         report_name=report_config.get("name", "财经要闻日报"),
-        sources=all_source_names
+        sources=all_source_names,
+        ai_stats=ai_stats
     )
 
     # 7. Publish

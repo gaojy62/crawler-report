@@ -1,6 +1,9 @@
-# {{ report_name }}
+# {{ report_name }} - {{ generated_date }}
 
 > 生成时间：{{ generated_at }}
+{% if ai_stats %}
+> AI 消耗：{{ ai_stats.total_input_tokens + ai_stats.total_output_tokens }} tokens (输入 {{ ai_stats.total_input_tokens }} / 输出 {{ ai_stats.total_output_tokens }}){% if ai_stats.total_cost_usd > 0 %}，费用 ${{ "%.6f"|format(ai_stats.total_cost_usd) }} USD{% endif %}
+{% endif %}
 > 数据来源：{{ sources | join('、') }}
 
 ---

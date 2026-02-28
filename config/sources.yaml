@@ -27,6 +27,7 @@ sources:
       limit: 15
 
   twitter:
+    # 官方媒体
     - account: "WSJ"
       type: media
       priority: 10
@@ -37,10 +38,60 @@ sources:
       priority: 9
       limit: 15
 
-    - account: "elonmusk"
+    - account: "zerohedge"
+      type: media
+      priority: 8
+      limit: 15
+
+    # 专业分析师
+    - account: "LizAnnSonders"
+      type: kol
+      priority: 9
+      limit: 10
+
+    - account: "PeterLBrandt"
+      type: kol
+      priority: 8
+      limit: 10
+
+    - account: "KobeissiLetter"
+      type: kol
+      priority: 8
+      limit: 10
+
+    - account: "Citrini7"
+      type: kol
+      priority: 8
+      limit: 10
+
+    # 价值投资/基本面
+    - account: "morganhousel"
       type: kol
       priority: 7
-      keywords: ["bitcoin", "crypto", "stock", "market"]
+      limit: 10
+
+    - account: "BrianFeroldi"
+      type: kol
+      priority: 7
+      limit: 10
+
+    # 中文圈
+    - account: "yuyy614893671"
+      type: kol
+      priority: 7
+      limit: 10
+
+    # 加密货币
+    - account: "saylor"
+      type: kol
+      priority: 6
+      keywords: ["bitcoin", "crypto"]
+      limit: 10
+
+    - account: "Pentosh1"
+      type: kol
+      priority: 6
+      keywords: ["bitcoin", "crypto", "eth"]
       limit: 10
 
 ai:

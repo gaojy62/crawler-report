@@ -45,6 +45,12 @@ SCORING_USER_TEMPLATE = """请评估以下新闻内容：
 class AIScorer:
     """AI-based content scorer using DeepSeek API"""
 
+    # DeepSeek pricing (USD per 1M tokens)
+    PRICING = {
+        "deepseek-chat": {"input": 0.27, "output": 1.10},
+        "deepseek-reasoner": {"input": 0.55, "output": 2.19},
+    }
+
     def __init__(self, config: dict):
         self.config = config
         self.dimensions = config.get("scoring", {}).get("dimensions", [
@@ -66,6 +72,13 @@ class AIScorer:
         self.model = config.get("model", "deepseek-chat")
         self.max_tokens = config.get("max_tokens", 4000)
 
+        # Token usage tracking
+        self.usage_stats = {
+            "total_input_tokens": 0,
+            "total_output_tokens": 0,
+            "total_cost_usd": 0.0
+        }
+
     async def score_item(self, item: CrawledItem) -> Optional[dict]:
         """Score a single item"""
         try:
@@ -85,6 +98,18 @@ class AIScorer:
                 max_tokens=500,
                 temperature=0.3
             )
+
+            # Track token usage
+            if response.usage:
+                input_tokens = response.usage.prompt_tokens or 0
+                output_tokens = response.usage.completion_tokens or 0
+                self.usage_stats["total_input_tokens"] += input_tokens
+                self.usage_stats["total_output_tokens"] += output_tokens
+
+                # Calculate cost
+                pricing = self.PRICING.get(self.model, self.PRICING["deepseek-chat"])
+                cost = (input_tokens * pricing["input"] + output_tokens * pricing["output"]) / 1_000_000
+                self.usage_stats["total_cost_usd"] += cost
 
             result_text = response.choices[0].message.content.strip()
 
@@ -138,3 +163,7 @@ class AIScorer:
                     })
 
         return scored_items
+
+    def get_usage_stats(self) -> dict:
+        """Return token usage statistics"""
+        return self.usage_stats.copy()

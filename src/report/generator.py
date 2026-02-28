@@ -24,7 +24,8 @@ class ReportGenerator:
         self,
         items: List[dict],
         report_name: str = "财经要闻日报",
-        sources: List[str] = None
+        sources: List[str] = None,
+        ai_stats: dict = None
     ) -> str:
         """Generate a Markdown report"""
         template = self.env.get_template("report.md.j2")
@@ -37,5 +38,6 @@ class ReportGenerator:
             generated_date=now.strftime("%Y-%m-%d"),
             items=items,
             sources=sources or [],
-            item_count=len(items)
+            item_count=len(items),
+            ai_stats=ai_stats
         )
