@@ -53,7 +53,8 @@ class WorkerClient:
                 else:
                     return {
                         "success": False,
-                        "error": result.get("error", f"HTTP {response.status_code}")
+                        "error": result.get("error", f"HTTP {response.status_code}"),
+                        "details": result.get("details")
                     }
 
             except httpx.RequestError as e:

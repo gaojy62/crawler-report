@@ -115,7 +115,13 @@ async def main():
         if result.get("push"):
             print(f"    Push notifications: sent={result['push'].get('sent')}, failed={result['push'].get('failed')}")
     else:
-        print(f"    Failed to publish: {result.get('error')}")
+        error_msg = result.get('error')
+        print(f"    Failed to publish: {error_msg}")
+        if result.get('details'):
+            print(f"    Details: {result.get('details')}")
+        # Exit with error so GitHub Actions can detect failure
+        import sys
+        sys.exit(1)
 
     # Update cache
     cache.save_history(top_items)
